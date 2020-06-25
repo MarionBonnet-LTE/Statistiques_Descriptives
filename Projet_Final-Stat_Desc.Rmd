@@ -1,0 +1,159 @@
+---
+title: "Projet Final - Statistiques Descriptives"
+author: "Marion Bonnet"
+output: html_document
+---
+
+
+
+*Jeu de données choisi: [Skilled musicians are indeed subject to the McGurk effect.](https://osf.io/5ezcp/)*
+
+
+
+```{r include=FALSE}
+library(readr)
+combined_data <- read_csv("combined_data.csv")
+```
+
+```{r include=FALSE}
+library(readxl)
+participant_demographic_information <- read_excel("participant_demographic_information.xlsx")
+```
+## Présentation du jeu de données
+
+Les données que nous proposons d'analyser ont été collectées dans le but de tester la sensibilité des musiciens à l'effet McGurk et fait suite à une étude tendant à réfuter cet effet chez les musiciens expérimentés ([Proverbio et al.,2016](https://www.nature.com/articles/srep30423)). 
+
+Les données s'intéressent principalement à l'expérience musicale des sujets recrutés et au taux de réponses correctes données lors de l'expérience. Ces variables sont mises en perspective par rapport au type de conditions et au point d'articulation des phonèmes testés. 
+
+Des données démographiques sont également disponibles pour les sujets non-musiciens et semblent constituer des variables aléatoires secondaires relatives à leur identité. 
+
+## Caractérisation des variables
+
+**variables manipulées**
+
+- condition: (intra-participant) variable catégorielle
+    - stimuli audio uniquement (ex. [*ba*])
+    - stimuli audio et vidéo correspondants (ex. audio [*ba*] et vidéo [*ba*])
+    - stimuli audio et vidéo non correspondants (ex. audio [*ba*] et vidéo [*ka*])
+    
+
+    
+- pratique musicale: (inter-participants) variable catégorielle     
+    - musicien
+    - non-musicien (mais ayant pu pratiqué d'un instrument de musique dans le passé)
+
+    
+    
+- point d'articulation des phonèmes:(stimuli audios et visuels) deux variables catégorielles: une pour les phonèmes entendus (audPoA), l'autre pour les phonème vus (vidPoA):
+    - labial
+    - labio-dental
+    - alvéolaire
+    - vélaire 
+
+    
+```
+ggplot(data=combined_data)+geom_bar(mapping = aes(x = audPoA))
+```
+
+```
+ggplot(data=combined_data)+geom_bar(mapping = aes(x = vidPoA))
+```
+
+
+- réponses correctes: (variable mesurée)
+    - réponse correspondant au stimuli audio présenté (true)
+    - réponse ne correspondant pas au stimui audio présenté (false)
+
+
+**variables aléatoires (sujets non-musiciens)** 
+
+
+- sexe: environ 21% d'hommes et 79% de femmes
+
+```
+ggplot(data= participant_demographic_information)+geom_bar(mapping = aes(x= Gender))
+```
+
+- âge: entre 18 et 36 ans; moyenne 21,36 ans. 
+
+```
+ggplot(data = participant_demographic_information)+geom_bar(mapping = aes(x=Age))
+```
+
+- main-dominante: droite pour 100% des sujets
+
+
+- région d'origine: majoritairement originaires de Hong-Kong
+
+```
+ggplot(data=participant_demographic_information)+
+geom_bar(mapping=aes(x=WhereFrom))
+```
+
+- dialecte chinois parlé: cantonais majoritaire
+
+```
+ggplot(data=participant_demographic_information)+
+geom_bar(mapping = aes(x=ChineseDialect))
+```
+
+- autre(s) langue(s) parlée(s): 80% des participants n'ont pas d'expérience dans une autre langue que le dialecte chinois parlé
+
+```
+ggplot(data=participant_demographic_information)+geom_bar(mapping = aes(x=OthetLanguageExperience))
+```
+
+
+## Caractérisations graphiques et quantitatives 
+
+**Taux de réponses correctes par condition chez les non-musiciens**
+
+```
+filter(Group=nonmusician)
+ggplot(data=combined_data)+geom_count(mapping = aes(y =Correct , x = McGurkCond))
+```
+
+**Taux de réponses correctes par condition chez les musiciens**
+
+```
+filter(Group=musician)
+ggplot(data=combined_data)+geom_count(mapping = aes(y =Correct , x = McGurkCond))
+```
+En comparant les deux graphiques précédents, nous devrions obtenir des éléments de réponses concernant la question de recherche que visent ces données. Si le taux de réponses correctes à la condition "audiovisual incongruent" est similaire entre les deux groupes, cela tendrait à montrer que la variable "expérience musicale" n'a pas d'effet sur la perception des phonèmes relative à l'effet McGurk. A l'inverse, un différence notable entres les groupes sur le taux de réponses correctes pour la condition "audiovisual incongruent" mais un taux similaire pour les autres conditions suggèreraient que l'expérience musicale joue un rôle sur la sensibilité à l'effet McGurk. Les données dont nous disposons ne semblent pas montrer de distinction signifiante entre les deux groupes, ce qui conforterait la première hypothèse. 
+
+**Comparaison de la répartitions des réponses correctes en fonction des deux typologies de conditions: Conditions McGurk et Condition Proverbio**
+
+Condition McGurk (pour les deux groupes)
+
+```
+ggplot(data=combined_data)+geom_count(mapping = aes(y =Correct , x = McGurkCond))
+```
+
+Condition Proverbio (pour les deux groupes)
+
+```
+ggplot(data=combined_data)+geom_count(mapping = aes(y =Correct , x = ProverbioCond))
+
+D'après les graphiques, la répartition semble être la même, ce qui tendrait donc à montrer que cette distinction n'est pas significative dans pour notre jeu de données. 
+
+
+## Interrogations suite à l'exploration des données
+
+
+- Il serait intéressant d'observer si d'autres facteurs peuvent influencer la sensibilité à l'effet McGurk. Certaines données des informations démographiques pourraient être utilisées: par exemple pour tester l'influence de la variable "autre(s) langue(s) parlée(s) sur la sensibilité à l'effet McGurk. Nous pourrions imaginer que la pratique d'une langue étrangère favorise l'attention portée aux stimuli auditifs spécifiques au langage et donc que cette variable à plus d'impact sur la sensibilité à l'effet McGurk que la pratique de la musique. 
+Le problème de notre jeu de données est que ces informations ne sont disponibles que pour 62 des 124 participants (uniquement les non-musiciens) et qu'elle ne sont pas regroupé dans le même fichier de données.
+
+
+
+- A l'état actuel, les données rendent difficile la visualisation de l'exactitude des réponses pour chaque groupe puisque les mesures sont faites pour chaque individu. Il serait pertinent de mesurer cette exactitude par un calcul, par exemple la soustraction des réponses incorrectes au réponses correctes et de se servir de se chiffre pour mettre en relation le taux global d'exactitude pour chaque groupe. Après lecture de l'article, il semble qu'une mesure similaire soit utilisée par les chercheurs:"accuracy". Les données bruts ne permettent pas d'obtenir une représentation de cette mesure. 
+
+
+
+- Il serait enfin intéressant d'observer les types de combinaisons de phonèmes qui génèrent le plus d'effet McGurk. Pour cela, il faudrait combiner les variables "audPoA" et "vidPoA" et erprésenter sur un graphique le taux de réponses correctes pour chacun des stimuli de la condition "audiovisual incongruent". 
+
+
+# References
+
+Politzer-Ahles, S., & Pan, L. (2019). Skilled musicians are indeed subject to the McGurk effect. Royal Society open science, 6(4), 181868.
+
+Proverbio, A. M., Massetti, G., Rizzi, E., & Zani, A. (2016). Skilled musicians are not subject to the McGurk effect. Scientific reports, 6(1), 1-11.
